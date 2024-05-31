@@ -1,6 +1,6 @@
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 
 import app.states as st
@@ -21,7 +21,6 @@ async def cmd_start(message: Message) -> None:
 
 @router.message(F.text == 'Назад в меню')
 async def back_to_menu(message: Message) -> None:
-    current_photo_id.clear()
     await message.answer('Меню', reply_markup=kb.main_keyboard)
 
 
@@ -37,6 +36,7 @@ async def open_photo(callback: CallbackQuery) -> None:
     current_photo_id.clear()
     current_photo_id.append(photo_id)
     await callback.message.answer_photo(photo=photo_file_id, reply_markup=kb.photo_keyboad)
+    await callback.answer('Отправленно')
 
 
 @router.message(F.text == 'Добавить фото')
@@ -77,6 +77,3 @@ async def rename_photo(message: Message, state: FSMContext) -> None:
 async def delete_photo(message: Message) -> None:
     await rq.delete_photo(current_photo_id[0])
     await message.answer('Фото удалено', reply_markup=kb.main_keyboard)
-
-
-

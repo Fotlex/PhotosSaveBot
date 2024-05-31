@@ -27,4 +27,4 @@ async def create_photos_keyboard():
             keyboard.add(InlineKeyboardButton(text=photo.name, callback_data=f'photo_{photo.id}'))
     except Exception:
         pass
-    return keyboard.adjust(1).as_markup()
+    return keyboard.adjust(2).as_markup()
