@@ -1,11 +1,11 @@
 from aiogram import Router, F
-from aiogram.types import Message, CallbackQuery
-from aiogram.filters import CommandStart, Command
+from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message, CallbackQuery
 
-import app.states as st
-import app.keyboards as kb
 import app.database.requests as rq
+import app.keyboards as kb
+import app.states as st
 
 router = Router()
 
@@ -36,7 +36,7 @@ async def open_photo(callback: CallbackQuery) -> None:
     current_photo_id.clear()
     current_photo_id.append(photo_id)
     await callback.message.answer_photo(photo=photo_file_id, reply_markup=kb.photo_keyboad)
-    await callback.answer('Отправленно')
+    await callback.answer('Отправлено')
 
 
 @router.message(F.text == 'Добавить фото')
@@ -57,7 +57,7 @@ async def save_photo(message: Message) -> None:
     photo_data = message.photo[-1]
     await rq.set_photo(photo_data.file_id, current_photo_name[0])
     current_photo_name.clear()
-    await message.answer('Успешно загруженно', reply_markup=kb.main_keyboard)
+    await message.answer('Успешно загружено', reply_markup=kb.main_keyboard)
 
 
 @router.message(F.text == 'Изменить')
