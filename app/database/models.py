@@ -16,17 +16,11 @@ class Base(AsyncAttrs, DeclarativeBase):
     pass
 
 
-class User(Base):
-    __tablename__ = 'users'
-
-    id: Mapped[int] = mapped_column(primary_key=True)
-    tg_id = mapped_column(BigInteger)
-
-
 class PhotoInfo(Base):
     __tablename__ = 'photos'
 
     id: Mapped[int] = mapped_column(primary_key=True)
+    tg_id = mapped_column(BigInteger)
     name: Mapped[str] = mapped_column()
     file_id: Mapped[str] = mapped_column()
 

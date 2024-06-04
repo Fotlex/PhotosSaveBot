@@ -1,24 +1,20 @@
 from app.database.models import async_session
-from app.database.models import PhotoInfo, User
+from app.database.models import PhotoInfo
 from sqlalchemy import select, update, delete
 
 
-async def set_user(tg_id) -> None:
+async def set_photo(file_id: str, name: str, tg_id) -> None:
     async with async_session() as session:
-        user = await session.scalar(select(User).where(User.tg_id == tg_id))
-
-        if not user:
-            session.add(User(tg_id=tg_id))
-            await session.commit()
-
-
-async def set_photo(file_id: str, name: str) -> None:
-    async with async_session() as session:
-        session.add(PhotoInfo(name=name, file_id=file_id))
+        session.add(PhotoInfo(name=name, file_id=file_id, tg_id=tg_id))
         await session.commit()
 
 
-async def get_photo_names():
+async def get_photo_names(tg_id):
+    async with async_session() as session:
+        return await session.scalars(select(PhotoInfo).where(PhotoInfo.tg_id == tg_id))
+
+
+async def get_general_catalog():
     async with async_session() as session:
         return await session.scalars(select(PhotoInfo))
 
@@ -38,3 +34,8 @@ async def delete_photo(photo_id: int):
     async with async_session() as session:
         await session.execute(delete(PhotoInfo).where(PhotoInfo.id == photo_id))
         await session.commit()
+
+
+async def delete_all_photo() -> None:
+    async with async_session() as session:
+        await session.executes(delete(PhotoInfo))
