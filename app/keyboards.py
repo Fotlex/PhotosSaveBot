@@ -39,5 +39,6 @@ async def create_general_photos_keyboard() -> InlineKeyboardMarkup:
 
 admin_keyboard = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text='Общий каталог'), KeyboardButton(text='Отчистить каталог')],
+    [KeyboardButton(text='Отправить рассылку')],
     [KeyboardButton(text='Назад в меню')]
 ], resize_keyboard=True)

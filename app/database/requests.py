@@ -1,3 +1,5 @@
+import os
+
 from app.database.models import async_session
 from app.database.models import PhotoInfo
 from sqlalchemy import select, update, delete
@@ -17,6 +19,11 @@ async def get_photo_names(tg_id):
 async def get_general_catalog():
     async with async_session() as session:
         return await session.scalars(select(PhotoInfo))
+
+
+async def get_all_users_id():
+    async with async_session() as session:
+        return await session.scalars(select(PhotoInfo.tg_id))
 
 
 async def get_photo_to_id(photo_id: int):

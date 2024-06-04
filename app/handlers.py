@@ -1,6 +1,6 @@
 import os
 
-from aiogram import Router, F
+from aiogram import Router, F, Bot
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
@@ -26,7 +26,7 @@ async def open_admin_panel(message: Message, state: FSMContext) -> None:
         await message.answer('Админ панель', reply_markup=kb.admin_keyboard)
         await state.set_state(st.States.admin_state)
     else:
-        await message.answer(f'У вас недостаточно прав {message.from_user.id}, {os.getenv('ADMIN_ID')}', reply_markup=kb.main_keyboard)
+        await message.answer(f'У вас недостаточно прав', reply_markup=kb.main_keyboard)
 
 
 @router.message(F.text == 'Общий каталог', st.States.admin_state)
@@ -34,16 +34,32 @@ async def open_general_catalog(message: Message) -> None:
     await message.answer('Общий каталог', reply_markup=await kb.create_general_photos_keyboard())
 
 
+@router.message(F.text == 'Отправить рассылку', st.States.admin_state)
+async def wait_newsletter(message: Message, state: FSMContext) -> None:
+    await message.answer('Введите текст рассылки')
+    await state.set_state(st.States.newsletter_state)
+
+
+@router.message(st.States.newsletter_state, F.text)
+async def create_newsletter(message: Message, state: FSMContext, bot: Bot) -> None:
+    all_users = set(await rq.get_all_users_id())
+    for user in all_users:
+        await bot.send_message(chat_id=user, text=message.text)
+    await state.set_state(st.States.admin_state)
+    await message.answer('Рассылка отправлена', reply_markup=kb.admin_keyboard)
+
+
 @router.message(F.text == 'Отчистить каталог', st.States.admin_state)
 async def clear_database(message: Message, state: FSMContext) -> None:
     await rq.delete_all_photo()
     await message.answer('База данных отчищена', reply_markup=kb.admin_keyboard)
-    await state.set_state(st.States.default_state)
+    await state.set_state(st.States.admin_state)
 
 
-@router.message(F.text == 'Назад в меню',)
-async def back_to_menu(message: Message) -> None:
+@router.message(F.text == 'Назад в меню')
+async def back_to_menu(message: Message, state: FSMContext) -> None:
     await message.answer('Меню', reply_markup=kb.main_keyboard)
+    await state.set_state(st.States.default_state)
 
 
 @router.message(F.text == 'Каталог')
